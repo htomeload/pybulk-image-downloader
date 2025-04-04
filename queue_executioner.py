@@ -9,9 +9,9 @@ class QueueExecutioner:
         self.urls_list = []
         self.is_job_done = False
 
-    def get_urls_list(self, text_input: str):
+    def get_urls_list(self):
         self.is_job_done = False
-        text_to_list = text_input.split("\n")
+        text_to_list = self.urls_text.split("\n")
         return text_to_list
 
     def reset_queue(self):
@@ -27,7 +27,7 @@ class QueueExecutioner:
 
         if self.index == 0:
             self.urls_text = text_input
-            self.urls_list = self.get_urls_list(text_input=text_input)
+            self.urls_list = self.get_urls_list()
             self.end_index = len(self.urls_list)
 
         if self.index < self.end_index:
