@@ -47,11 +47,12 @@ class UI:
         self.download_btn.grid(column=0, row=5)
 
     def reset_form(self):
+        self.text_editor_input.config(state="normal")
+        self.directory_input.config(state="normal")
         self.text_editor_input.delete(index1=0.0, index2='end-1c')
         self.directory_input.delete(0, tkinter.END)
         self.directory_input.insert(0, "Downloads")
         self.download_btn.config(state="normal")
-        self.text_editor_input.config(state="normal")
 
     def notify_download_complete(self):
         self.messagebox.showinfo(title="Download completed", message="All images was downloaded")
@@ -59,6 +60,7 @@ class UI:
     def start_download(self):
         self.download_btn.config(state="disabled")
         self.text_editor_input.config(state="disabled")
+        self.directory_input.config(state="disabled")
         self.queue_executioner.exec_queues(text_input=self.text_editor_input.get(index1=0.0, index2='end-1c'), callback=self.show_recent_downloaded_image, target_path=self.directory_input.get())
 
         if self.queue_executioner.is_job_done:
@@ -68,8 +70,7 @@ class UI:
             self.update_progress_bar()
 
     def update_progress_bar(self):
-        if self.queue_executioner.index == 1:
-            self.progress_bar.config(maximum=self.queue_executioner.end_index)
+        self.progress_bar.config(maximum=self.queue_executioner.end_index)
         self.progress_bar.step(1)
 
     def show_recent_downloaded_image(self, img_path: str):
