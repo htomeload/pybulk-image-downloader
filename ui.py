@@ -72,36 +72,33 @@ class UI:
         _width = 0
         _height = 0
 
-        if exists(img_path):
-            full_path = join(self.current_dir, img_path)
+        full_path = join(self.current_dir, img_path)
 
-            image = Image.open(fp=full_path, mode="r")
+        image = Image.open(fp=full_path, mode="r")
 
-            self.recent_downloaded_image = ImageTk.PhotoImage(image)
+        self.recent_downloaded_image = ImageTk.PhotoImage(image)
 
-            width, height = image.size
+        width, height = image.size
 
-            if width > height:
-                _width = 480
-                _height = 320
-            else:
-                _width = 320
-                _height = 480
-
-            ratio = min(_width / width, _height / height)
-            new_width, new_height = int(width * ratio), int(height * ratio)
-
-            # Resize the image
-            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-
-            # Convert to Tkinter-compatible format
-            self.recent_downloaded_image = ImageTk.PhotoImage(image)
-
-            # Clear canvas and place new image centered
-            self.canvas.delete("all")
-            self.canvas.create_image(_width // 2, _height // 2, image=self.recent_downloaded_image,
-                                     anchor="center")
-
-            self.window.after(1500, self.start_download)
+        if width > height:
+            _width = 480
+            _height = 320
         else:
-            print("File not exist")
+            _width = 320
+            _height = 480
+
+        ratio = min(_width / width, _height / height)
+        new_width, new_height = int(width * ratio), int(height * ratio)
+
+        # Resize the image
+        image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+        # Convert to Tkinter-compatible format
+        self.recent_downloaded_image = ImageTk.PhotoImage(image)
+
+        # Clear canvas and place new image centered
+        self.canvas.delete("all")
+        self.canvas.create_image(_width // 2, _height // 2, image=self.recent_downloaded_image,
+                                 anchor="center")
+
+        self.window.after(1500, self.start_download)
