@@ -1,6 +1,6 @@
 import tkinter
 from tkinter import messagebox
-from os.path import exists, join, dirname
+from os.path import exists, abspath
 from PIL import Image, ImageTk, ImageFile
 from queue_executioner import QueueExecutioner
 from image_download_manager import ImageDownloadManager
@@ -14,7 +14,6 @@ class UI:
 
         self.queue_executioner = QueueExecutioner()
         self.image_download_manager = ImageDownloadManager()
-        self.current_dir = dirname(__file__)
         self.download_button_enable = True
 
         self.window = tkinter.Tk()
@@ -72,7 +71,7 @@ class UI:
         _width = 0
         _height = 0
 
-        full_path = join(self.current_dir, img_path)
+        full_path = abspath(img_path)
 
         image = Image.open(fp=full_path, mode="r")
 
