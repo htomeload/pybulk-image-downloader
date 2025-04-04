@@ -1,22 +1,28 @@
 from os import makedirs
 from os.path import isdir
+from time import sleep
+
 import requests as r
+from tkinter import messagebox
 
 class ImageDownloadManager:
     def __init__(self):
         self.requests = r
+        self.last_image_success = False
         self.valid_extension_list = ["jpg", "jpeg", "png", "gif", "webp", "avif", "apng", "png", "gif", "ppm", "pgm"]
         self.native_support_extension = ["png", "gif", "ppm", "pgm"]
 
     def download_image(self, url: str, filename: str, callback, directory: str = ""):
         try:
             if url is None:
+                self.last_image_success = False
                 return
 
             response = self.requests.get(url=url, stream=True)
             response.raise_for_status()
 
             if not response.ok:
+                self.last_image_success = False
                 return
 
             file_extension = self.get_file_extension(url=url)
@@ -35,7 +41,10 @@ class ImageDownloadManager:
                     handler.write(block)
 
                 callback(img_path=complete_file_path)
-        except r.exceptions.RequestException as e:
+
+            self.last_image_success = True
+        except r.exceptions.RequestException as RequestException:
+            self.last_image_success = False
             return
 
     def get_file_extension(self, url: str):
