@@ -1,5 +1,5 @@
 import tkinter
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 from os.path import exists, abspath
 from PIL import Image, ImageTk, ImageFile
 from queue_executioner import QueueExecutioner
@@ -28,6 +28,7 @@ class UI:
         self.directory_input.insert(0, "Downloads")
         self.canvas = tkinter.Canvas(width=320, height=480, background="white")
         self.download_btn = tkinter.Button(text="Download", width=24, command=self.start_download)
+        self.progress_bar = ttk.Progressbar(length=810)
         self.recent_downloaded_image = None
         self.messagebox = messagebox
 
@@ -41,8 +42,9 @@ class UI:
         self.downloaded_image_label.grid(column=4, row=0)
         self.canvas.grid(column=4, row=1, padx=(40, 0))
         self.directory_label.grid(column=0, row=2)
-        self.directory_input.grid(column=0, row=3, columnspan=3, pady=20)
-        self.download_btn.grid(column=0, row=4)
+        self.directory_input.grid(column=0, row=3, columnspan=3, pady=(20, 0))
+        self.progress_bar.grid(column=0, row=4, columnspan=3, pady=20)
+        self.download_btn.grid(column=0, row=5)
 
     def reset_form(self):
         self.text_editor_input.delete(index1=0.0, index2='end-1c')
@@ -60,6 +62,13 @@ class UI:
         if self.queue_executioner.is_job_done:
             self.notify_download_complete()
             self.reset_form()
+        else:
+            self.update_progress_bar()
+
+    def update_progress_bar(self):
+        if self.queue_executioner.index == 1:
+            self.progress_bar.config(maximum=self.queue_executioner.end_index)
+        self.progress_bar.step(1)
 
     def show_recent_downloaded_image(self, img_path: str):
         if not img_path:
