@@ -23,7 +23,7 @@ class UI:
         self.text_editor_input = tkinter.Text(width=100)
         self.urls_list_label = tkinter.Label(text="Enter urls image (one url per line)", font=LABEL_FONT)
         self.downloaded_image_label = tkinter.Label(text="Recently Downloaded", font=LABEL_FONT, anchor="w", width=30)
-        self.directory_label = tkinter.Label(text="Download to directory (using \ for sub-directory)", font=LABEL_FONT, anchor="w", width=90)
+        self.directory_label = tkinter.Label(text="Download to directory (If leave blank, default will be 'Downloads')", font=LABEL_FONT, anchor="w", width=90)
         self.directory_input = tkinter.Entry(width=135)
         self.directory_input.insert(0, "Downloads")
         self.canvas = tkinter.Canvas(width=320, height=480, background="white")
@@ -51,12 +51,14 @@ class UI:
         self.directory_input.delete(0, tkinter.END)
         self.directory_input.insert(0, "Downloads")
         self.download_btn.config(state="normal")
+        self.text_editor_input.config(state="normal")
 
     def notify_download_complete(self):
         self.messagebox.showinfo(title="Download completed", message="All images was downloaded")
 
     def start_download(self):
         self.download_btn.config(state="disabled")
+        self.text_editor_input.config(state="disabled")
         self.queue_executioner.exec_queues(text_input=self.text_editor_input.get(index1=0.0, index2='end-1c'), callback=self.show_recent_downloaded_image, target_path=self.directory_input.get())
 
         if self.queue_executioner.is_job_done:
