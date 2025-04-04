@@ -33,7 +33,7 @@ class QueueExecutioner:
         if self.index < self.end_index:
             self.image_download_manager.download_image(url=self.urls_list[self.index], filename=str(self.index),
                                                        directory=target_path, callback=callback)
-            if self.image_download_manager.last_image_success:
+            if self.image_download_manager.is_last_file_download_success():
                 self.index += 1
         else:
             self.reset_queue()

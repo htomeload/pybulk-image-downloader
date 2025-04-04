@@ -65,10 +65,7 @@ class UI:
         if not img_path:
             return
 
-        if not exists(img_path):
-            return
-
-        if self.image_download_manager.last_image_success:
+        if exists(img_path):
             _width = 0
             _height = 0
 
