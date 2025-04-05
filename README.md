@@ -1,8 +1,10 @@
 # pybulk-image-downloader
-A simply bulk image downloader, develop by Python 3 (Version 3.11)
+A simply bulk image downloader, develop using Python 3 (Version 3.11)
+
+![preview app](https://i.imgur.com/Hd1RCpN.png)
 
 ## Requriement
-This porject using Pillow and requests, use pip to install requires libraries
+This project using Pillow and requests, use pip to install requires libraries
 ```
 pip install Pillow requests
 ```
