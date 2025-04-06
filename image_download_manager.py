@@ -35,6 +35,7 @@ class ImageDownloadManager:
                 file_extension = self.get_file_extension(url=url)
 
                 if directory:
+                    directory = directory.strip()
                     if not isdir(directory):
                         makedirs(directory, exist_ok=True)
 
