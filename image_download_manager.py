@@ -26,6 +26,7 @@ class ImageDownloadManager:
 
                 if not response.ok:
                     print("[WARNING] Response not ok")
+                    self.download_success = False
                     return
 
                 file_extension = self.get_file_extension(url=url)
@@ -46,7 +47,6 @@ class ImageDownloadManager:
             if file_md5 in self.downloaded_files_md5:
                 print(f"[SKIPPED - DUPLICATE CONTENT] {url}")
                 remove(complete_file_path)
-                self.download_success = True
         except r.exceptions.RequestException as RequestException:
             print(f"[ERROR] Request exception {url}: ", str(RequestException))
             self.last_file_path = ""
