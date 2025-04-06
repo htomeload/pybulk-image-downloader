@@ -17,6 +17,7 @@ class ImageDownloadManager:
             if url is None or len(url) < 1:
                 print("[WARNING] URL is none or empty string")
                 self.download_success = True
+                self.last_file_path = ""
                 callback(img_path="")
                 return
 
@@ -27,6 +28,8 @@ class ImageDownloadManager:
                 if not response.ok:
                     print("[WARNING] Response not ok")
                     self.download_success = False
+                    self.last_file_path = ""
+                    callback(img_path="")
                     return
 
                 file_extension = self.get_file_extension(url=url)
