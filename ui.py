@@ -100,7 +100,7 @@ class UI:
         self.progress_bar.step(1)
 
     def show_recent_downloaded_image(self, img_path: str):
-        if not img_path or len(img_path) < 1:
+        if not img_path or not img_path.strip():
             self.window.after(1500, self.start_download)
             return
 
