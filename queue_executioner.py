@@ -31,9 +31,12 @@ class QueueExecutioner:
             self.end_index = len(self.urls_list)
 
         if self.index < self.end_index:
+            print(f"Queue: {self.index + 1}/{self.end_index}")
             self.image_download_manager.download_image(url=self.urls_list[self.index], filename=str(self.index),
                                                        directory=target_path, callback=callback)
             if self.image_download_manager.is_last_file_download_success():
                 self.index += 1
         else:
+            print("JOB DONE")
             self.reset_queue()
+            self.image_download_manager.reset_download_manager()
