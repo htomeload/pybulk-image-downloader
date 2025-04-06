@@ -14,12 +14,14 @@ class ImageDownloadManager:
 
     def download_image(self, url: str, filename: str, callback, directory: str = ""):
         try:
-            if url is None or len(url) < 1:
+            if not url or not url.strip():
                 print("[WARNING] URL is none or empty string")
                 self.download_success = True
                 self.last_file_path = ""
                 callback(img_path="")
                 return
+
+            url = url.strip()
 
             with self.requests.get(url=url, stream=True) as response:
                 response.raise_for_status()
