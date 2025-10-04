@@ -159,7 +159,20 @@ class UI:
         if self.thread_stop_event:
             self.thread_stop_event.set()
 
+    def validation(self):
+        if len(self.text_editor_input.get(index1=0.0, index2='end-1c').strip()) == 0:
+            return False
+
+        if len(self.directory_input.get().strip()) == 0:
+            return False
+
+        return True
+
     def start_download(self):
+        if not self.validation():
+            self.notify_download_abort()
+            return
+
         self.abort_btn.config(state="normal")
         self.download_btn.config(state="disabled")
         self.text_editor_input.config(state="disabled")
