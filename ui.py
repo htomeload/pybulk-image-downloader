@@ -1,3 +1,4 @@
+import threading
 import tkinter
 from tkinter import messagebox, ttk
 from os.path import exists, abspath
@@ -11,6 +12,8 @@ class UI:
     def __init__(self):
         # To Support load large file or missing blocks img
         ImageFile.LOAD_TRUNCATED_IMAGES = True
+        self.main_thread = None
+        self.thread_stop_event = None
 
         self.queue_executioner = QueueExecutioner()
         self.image_download_manager = ImageDownloadManager()
@@ -51,6 +54,8 @@ class UI:
         self.abort_btn.grid(column=1, row=5)
 
     def reset_form(self):
+        self.main_thread = None
+        self.thread_stop_event = None
         self.abort_btn.config(state="disabled")
         self.text_editor_input.config(state="normal")
         self.directory_input.config(state="normal")
@@ -60,6 +65,8 @@ class UI:
         self.download_btn.config(state="normal")
 
     def soft_reset_form(self):
+        self.main_thread = None
+        self.thread_stop_event = None
         self.text_editor_input.config(state="normal")
         self.directory_input.config(state="normal")
         self.download_btn.config(state="normal")
@@ -77,31 +84,40 @@ class UI:
     def abort_download(self):
         self.is_manually_abort = True
 
+        if self.thread_stop_event:
+            self.thread_stop_event.set()
+
     def start_download(self):
         self.abort_btn.config(state="normal")
         self.download_btn.config(state="disabled")
         self.text_editor_input.config(state="disabled")
         self.directory_input.config(state="disabled")
 
-        if not self.is_manually_abort:
-            self.queue_executioner.exec_queues(text_input=self.text_editor_input.get(index1=0.0, index2='end-1c'), callback=self.show_recent_downloaded_image, target_path=self.directory_input.get())
-
-            if self.queue_executioner.is_job_done:
-                self.notify_download_complete()
-                self.reset_form()
-            else:
-                self.update_progress_bar()
-        else:
-            self.notify_download_abort()
-            self.soft_reset_form()
+        self.thread_stop_event = threading.Event()
+        self.main_thread = threading.Thread(
+            target=self.queue_executioner.exec_queues,
+            args=(self.text_editor_input.get(index1=0.0, index2='end-1c'), self.show_recent_downloaded_image, self.directory_input.get(), self.thread_stop_event),
+            daemon=True
+        )
+        self.main_thread.start()
 
     def update_progress_bar(self):
         self.progress_bar.config(maximum=self.queue_executioner.end_index)
         self.progress_bar.step(1)
 
     def show_recent_downloaded_image(self, img_path: str):
+        self.window.after(0, self._update_recent_downloaded_image, img_path)
+
+    def _update_recent_downloaded_image(self, img_path: str):
+        if self.queue_executioner.is_job_done:
+            self.notify_download_complete()
+            self.reset_form()
+
+        if self.is_manually_abort:
+            self.notify_download_abort()
+            self.soft_reset_form()
+
         if not img_path or not img_path.strip():
-            self.window.after(1500, self.start_download)
             return
 
         if exists(img_path):
@@ -137,6 +153,4 @@ class UI:
             self.canvas.create_image(_width // 2, _height // 2, image=self.recent_downloaded_image,
                                      anchor="center")
 
-            self.window.after(1500, self.start_download)
-        else:
-            self.window.after(5000, self.start_download)
+            self.update_progress_bar()

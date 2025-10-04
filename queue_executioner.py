@@ -11,17 +11,17 @@ class QueueExecutioner:
 
     def get_urls_list(self):
         self.is_job_done = False
-        text_to_list = self.urls_text.split("\n")
+        text_to_list = [line.strip() for line in self.urls_text.split('\n') if line.strip()]
         return text_to_list
 
-    def reset_queue(self):
+    def reset_queue(self, is_abort: bool = False):
         self.index = 0
         self.end_index = 0
         self.urls_text = ""
         self.urls_list = []
-        self.is_job_done = True
+        self.is_job_done = not is_abort
 
-    def exec_queues(self, text_input: str, callback, target_path: str = "Downloads"):
+    def exec_queues(self, text_input: str, callback, target_path: str = "Downloads", thread_event = None):
         if not text_input:
             return
 
@@ -30,13 +30,18 @@ class QueueExecutioner:
             self.urls_list = self.get_urls_list()
             self.end_index = len(self.urls_list)
 
-        if self.index < self.end_index:
+        for item in self.urls_list:
+            if thread_event.is_set():
+                print(f"ABORTED!")
+                return
+
             print(f"Queue: {self.index + 1}/{self.end_index}")
-            self.image_download_manager.download_image(url=self.urls_list[self.index], filename=str(self.index),
+            self.image_download_manager.download_image(url=item, filename=f"image_${str(self.index)}",
                                                        directory=target_path, callback=callback)
             if self.image_download_manager.is_last_file_download_success():
                 self.index += 1
-        else:
-            print("JOB DONE")
-            self.reset_queue()
-            self.image_download_manager.reset_download_manager()
+
+        print("JOB DONE")
+        self.reset_queue(is_abort=thread_event.is_set())
+        self.image_download_manager.reset_download_manager()
+        callback(img_path="")
