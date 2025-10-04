@@ -36,7 +36,7 @@ class QueueExecutioner:
                 return
 
             print(f"Queue: {self.index + 1}/{self.end_index}")
-            self.image_download_manager.download_image(url=item, filename=f"image_${str(self.index)}",
+            self.image_download_manager.download_image(url=item, filename=f"image_{str(self.index)}",
                                                        directory=target_path, callback=callback)
             if self.image_download_manager.is_last_file_download_success():
                 self.index += 1
