@@ -1,9 +1,12 @@
 from os import makedirs, remove
-from os.path import isdir, exists, abspath
+from os.path import isdir, abspath
 import requests as r
 import hashlib
+from logs import Logs
 
 class ImageDownloadManager:
+    logger = Logs()
+
     def __init__(self):
         self.requests = r
         self.last_file_path = ""
@@ -17,7 +20,7 @@ class ImageDownloadManager:
         for attempt in range(0, self.max_attempt):
             try:
                 if not url or not url.strip():
-                    print("[WARNING] URL is none or empty string")
+                    self.logger.log(text="[WARNING] URL is none or empty string")
                     self.download_success = True
                     self.last_file_path = ""
                     callback(img_path="")
@@ -30,7 +33,7 @@ class ImageDownloadManager:
                     md5_hash = hashlib.md5()
 
                     if not response.ok:
-                        print("[WARNING] Response not ok")
+                        self.logger.log("[WARNING] Response not ok")
                         self.download_success = False
                         self.last_file_path = ""
                         callback(img_path="")
@@ -53,22 +56,24 @@ class ImageDownloadManager:
 
                 file_md5 = md5_hash.hexdigest()
                 if file_md5 in self.downloaded_files_md5:
-                    print(f"[SKIPPED - DUPLICATE CONTENT] {url}")
+                    self.logger.log(f"[SKIPPED - DUPLICATE CONTENT] {url}")
                     remove(complete_file_path)
             except r.exceptions.RequestException as RequestException:
-                print(f"[Attempt {attempt+1}/{self.max_attempt}] [ERROR] Request exception {url}: ", str(RequestException))
+                self.logger.log(f"[Attempt {attempt+1}/{self.max_attempt}] [ERROR] Request exception {url}: {str(RequestException)}")
                 if attempt == self.max_attempt:
                     self.last_file_path = ""
                     self.download_success = False
+                    self.logger.log(f"[SKIPPED - DOWNLOAD FAILED] Download file from {url} failed due to {str(RequestException)} ")
                     return
             except Exception as e:
-                print(f"[Attempt {attempt+1}/{self.max_attempt}] [ERROR] Download file failed for {url}: ", str(e))
+                self.logger.log(f"[Attempt {attempt+1}/{self.max_attempt}] [ERROR] Download file failed for {url}: {str(e)}")
                 if attempt == self.max_attempt:
                     self.last_file_path = ""
                     self.download_success = False
+                    self.logger.log(f"[SKIPPED - DOWNLOAD FAILED] Download file from {url} failed due to {str(e)}")
                     return
             else:
-                print(f"Downloaded file from url: {url}")
+                self.logger.log(f"[SUCCEED] Downloaded file from url: {url}")
                 self.add_downloaded_file_md5(file_path=complete_file_path)
                 self.last_file_path = complete_file_path
                 self.download_success = True

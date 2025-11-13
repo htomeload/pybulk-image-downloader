@@ -5,6 +5,7 @@ from os.path import exists, abspath
 from PIL import Image, ImageTk, ImageFile
 from queue_executioner import QueueExecutioner
 from image_download_manager import ImageDownloadManager
+from logs import Logs
 
 LABEL_FONT = ("Segoe UI", 12)
 
@@ -16,7 +17,12 @@ COLOR_ACCENT = "#2898ff"          # The bright blue
 COLOR_TEXT_PRIMARY = "#333333"    # Dark gray for main text
 
 class UI:
+    logger = Logs()
+
     def __init__(self):
+        # Clear logs once per session
+        self.logger.clear_log()
+
         # To Support load large file or missing blocks img
         ImageFile.LOAD_TRUNCATED_IMAGES = True
         self.main_thread = None

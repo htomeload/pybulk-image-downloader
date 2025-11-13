@@ -1,6 +1,9 @@
 from image_download_manager import ImageDownloadManager
+from logs import Logs
 
 class QueueExecutioner:
+    logger = Logs()
+
     def __init__(self):
         self.image_download_manager = ImageDownloadManager()
         self.urls_text = ""
@@ -32,16 +35,17 @@ class QueueExecutioner:
 
         for item in self.urls_list:
             if thread_event.is_set():
-                print(f"ABORTED!")
+                self.logger.log(f"[INFO] ABORTED!")
                 return
 
-            print(f"Queue: {self.index + 1}/{self.end_index}")
+            self.logger.log(f"[INFO] Queue: {self.index + 1}/{self.end_index}")
             self.image_download_manager.download_image(url=item, filename=f"image_{str(self.index)}",
                                                        directory=target_path, callback=callback)
-            if self.image_download_manager.is_last_file_download_success():
-                self.index += 1
 
-        print("JOB DONE")
+            self.index += 1
+
+        self.logger.log("[INFO] JOB DONE")
+        self.logger.log("")
         self.reset_queue(is_abort=thread_event.is_set())
         self.image_download_manager.reset_download_manager()
         callback(img_path="")
