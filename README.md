@@ -16,6 +16,7 @@ pip install Pillow requests
 ```
 - main.py
   |
+  - logs.py
   - ui.py
     |
     - queue_executioner.py
